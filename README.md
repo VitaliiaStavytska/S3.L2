@@ -1,0 +1,108 @@
+# S3.L2
+-- create a table Aeroporto
+CREATE TABLE Aeroporto (
+  città VARCHAR(100) PRIMARY KEY,
+  nazione TEXT(100) NOT NULL,
+  num_piste VARCHAR(30)
+);
+
+-- insert some values
+INSERT INTO Aeroporto VALUES ('Bologna', 'IT', '15B');
+INSERT INTO Aeroporto VALUES ('Madrid', 'SP', '9N');
+INSERT INTO Aeroporto VALUES ('Paris', 'FR', NULL);
+INSERT INTO Aeroporto VALUES ('Torino', 'IT', '9N');
+INSERT INTO Aeroporto VALUES ('Prague', 'CZ', NULL);
+INSERT INTO Aeroporto VALUES ('Krakow', 'PO', '1A');
+INSERT INTO Aeroporto VALUES ('Riga', 'LV', '17D');
+INSERT INTO Aeroporto VALUES ('Cork', 'IE', '43F');
+INSERT INTO Aeroporto VALUES ('Valletta', 'MT', '64F');
+INSERT INTO Aeroporto VALUES ('Luxembourg', 'LU', NULL);
+INSERT INTO Aeroporto VALUES ('Bucharest', 'RO', '32V');
+INSERT INTO Aeroporto VALUES ('Vilnius', 'LT', '21A');
+-- update some values
+UPDATE Aeroporto SET num_piste='21B' WHERE città='Vilnius';
+UPDATE Aeroporto SET num_piste='8G' WHERE città='Paris';
+-- fetch all values
+SELECT * FROM Aeroporto;
+
+-- create a table Volo
+CREATE TABLE Volo (
+  IdVolo VARCHAR(50) PRIMARY KEY,
+  GiornoSett VARCHAR(50),
+  num_piste VARCHAR(30),
+  CittaPart VARCHAR(50) NOT NULL,
+  OraPart TIME,
+  CittaArr TEXT(50) NOT NULL,
+  OraArr TIME,
+  TipoAereo VARCHAR(50),
+  FOREIGN KEY (CittaPart) REFERENCES Aeroporto(città)
+);
+
+-- create an index on the TipoAereo column
+CREATE INDEX idx_TipoAereo ON Volo(TipoAereo);
+
+-- insert some values
+INSERT INTO Volo VALUES ('VO2145', 'Lunedi', '34', 'Bucharest', '07:00', 'Madrid', '18:00', 'Airbus A320');
+INSERT INTO Volo VALUES ('WZ5432', 'Martedi', '8B', 'Paris', '09:40', 'Bucharest', '14:35', 'Boeing 737');
+INSERT INTO Volo VALUES ('RY3214', 'Mercoledi', '45G','Prague', '11:10', 'Torino', '07:15', 'Airbus A320');
+INSERT INTO Volo VALUES ('IT4578', 'Giovedi', '15E', 'Torino', '12:05', 'Krakow', '12:40', 'Boeing 737');
+INSERT INTO Volo VALUES ('QA1243', 'Venerdi', '67F', 'Krakow', '12:00', 'Riga', '18:35', 'Airbus A320');
+INSERT INTO Volo VALUES ('UI4598', 'Sabato', '6T', 'Riga', '10:00', 'Prague', '14:30', 'Boeing 737');
+INSERT INTO Volo VALUES ('AQ8901', 'Domenica', '1D', 'Cork', '11:00', 'Paris', '17:00', 'Airbus A320');
+INSERT INTO Volo VALUES ('BH5823', 'Lunedi', '8S', 'Bologna', '13:50', 'Luxembourg', '18:30', 'Boeing 737');
+INSERT INTO Volo VALUES ('DG2341', 'Martedi', '1C', 'Valletta', '17:00', 'Bologna', '21:05', 'Airbus A320');
+INSERT INTO Volo VALUES ('AZ274', 'Giovedi', '3H', 'Luxembourg', '18:00', 'Cork', '20:50', 'Boeing 737');
+
+-- fetch all values
+SELECT * FROM Volo;
+
+
+-- create table AEREO
+CREATE TABLE AEREO (
+  TipoAereo VARCHAR(50),
+  NumPasseggeri INT,
+  QtaMerci DOUBLE,
+  FOREIGN KEY (TipoAereo) REFERENCES Volo(TipoAereo)
+);
+
+-- insert some values
+INSERT INTO AEREO VALUES ('Airbus A320', 146, 23);
+INSERT INTO AEREO VALUES ('Boeing 737', 170, 75);
+INSERT INTO AEREO VALUES ('Airbus A310', 132, 160);
+INSERT INTO AEREO VALUES ('Boeing 737', 157, 74);
+INSERT INTO AEREO VALUES ('Airbus A320', 120, 89);
+INSERT INTO AEREO VALUES ('Boeing 737', 118, 38);
+INSERT INTO AEREO VALUES ('Airbus A320', 32, 405);
+INSERT INTO AEREO VALUES ('Boeing 737', 87, 150);
+INSERT INTO AEREO VALUES ('Airbus A320', 58, 248);
+INSERT INTO AEREO VALUES ('Boeing 737', 160, 150);
+INSERT INTO AEREO VALUES ('Airbus A320', 200, 187);
+INSERT INTO AEREO VALUES ('Boeing 737', 29, 500);
+
+SELECT * FROM AEREO;
+
+
+-- 1) Le città con un aeroporto di cui non è noto il numero di piste:
+SELECT * FROM Aeroporto WHERE num_piste IS NULL;
+
+
+ --2) Tipi di aereo usati nei voli che partono da Torino:
+SELECT DISTINCT TipoAereo FROM Volo WHERE CittaPart = 'Torino';
+
+
+ --3) Le città da cui partono voli diretti a Bologna:
+SELECT DISTINCT CittaPart FROM Volo WHERE CittaArr = 'Bologna';
+
+
+-- 4) Le città da cui parte e arriva il volo con codice AZ274:
+SELECT DISTINCT CittaPart, CittaArr FROM Volo WHERE IdVolo = 'AZ274';
+
+--5) Id dei voli che partono prima di mezzogiorno:
+SELECT DISTINCT IdVolo FROM Volo WHERE OraPart < '12:00';
+
+--6) Orari della partenza di tutti Airbus:
+SELECT DISTINCT OraArr FROM Volo WHERE TipoAereo = 'Airbus A320';
+
+
+--7) Paese della partenza dall'aeroporto di Parigi:
+SELECT DISTINCT nazione FROM Aeroporto WHERE città = 'Paris';
